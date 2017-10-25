@@ -82,6 +82,7 @@ InertialSenseROS::InertialSenseROS() :
     if (INS_.stream_on)
     {
         INS_.pub = nh_.advertise<nav_msgs::Odometry>("ins", 1);
+        INS_.pub2 = nh_.advertise<nav_msgs::Odometry>("inertial_frame", 1);
         inertialSenseInterface_.BroadcastBinaryData(DID_INS_1, (int)(1000/INS_.stream_rate), &data_callback);
         inertialSenseInterface_.BroadcastBinaryData(DID_INS_2, (int)(1000/INS_.stream_rate), &data_callback);
         inertialSenseInterface_.BroadcastBinaryData(DID_DUAL_IMU, (int)(1000/INS_.stream_rate), &data_callback);
@@ -155,11 +156,23 @@ InertialSenseROS::InertialSenseROS() :
 
 void InertialSenseROS::INS1_callback()
 {
-    odom_msg.header.frame_id = frame_id_;
+    if (got_GPS_fix_ & inertial_init)
+    {
+        flash_cfg_.refLla[0] = d_.ins1.lla[0] * M_PI / 180.0;
+        flash_cfg_.refLla[1] = d_.ins1.lla[1] * M_PI / 180.0;
+        flash_cfg_.refLla[2] = d_.ins1.lla[2];
+        inertial_init = false;
+    }
+    odom_msg2.header.frame_id = frame_id_;
 
-    odom_msg.pose.pose.position.x = d_.ins1.ned[0];
-    odom_msg.pose.pose.position.y = d_.ins1.ned[1];
-    odom_msg.pose.pose.position.z = d_.ins1.ned[2];
+    odom_msg2.pose.pose.position.x = d_.ins1.ned[0];
+    odom_msg2.pose.pose.position.y = d_.ins1.ned[1];
+    odom_msg2.pose.pose.position.z = d_.ins1.ned[2];
+
+    odom_msg2.pose.pose.orientation.x = d_.ins1.theta[0];
+    odom_msg2.pose.pose.orientation.y = d_.ins1.theta[1];
+    odom_msg2.pose.pose.orientation.z = d_.ins1.theta[2];
+    INS_.pub2.publish(odom_msg2);
 }
 
 

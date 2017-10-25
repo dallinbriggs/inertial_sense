@@ -35,6 +35,7 @@ private:
   ros::Duration IMU_offset_;
   bool first_IMU_message_ = true;
   bool got_GPS_fix_ = false;
+  bool inertial_init = true;
   double GPS_to_week_offset_;
 
   nvm_flash_cfg_t flash_cfg_;
@@ -76,6 +77,7 @@ private:
   // Data to hold on to in between callbacks
   sensor_msgs::Imu imu1_msg, imu2_msg;
   nav_msgs::Odometry odom_msg;
+  nav_msgs::Odometry odom_msg2;
   inertial_sense::GPS gps_msg;
   inertial_sense::GPSInfo gps_info_msg;
   uint64_t GPS_week_seconds;
