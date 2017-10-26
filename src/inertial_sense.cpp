@@ -27,7 +27,6 @@ InertialSenseROS::InertialSenseROS() :
 
     // Configure the uINS
     flash_cfg_ = inertialSenseInterface_.GetFlashConfig();
-    flash_cfg2_ = inertialSenseInterface_.GetFlashConfig();
 
     // Change the flash based on parameters
     std::vector<double> INS_rpy(3, 0.0);
@@ -64,8 +63,8 @@ InertialSenseROS::InertialSenseROS() :
     flash_cfg_.gpsAntOffset[1] = GPS_ant_xyz[1];
     flash_cfg_.gpsAntOffset[2] = GPS_ant_xyz[2];
 
-    flash_cfg_.refLla[0] = GPS_ref_lla[0] * M_PI / 180.0;
-    flash_cfg_.refLla[1] = GPS_ref_lla[1] * M_PI / 180.0;
+    flash_cfg_.refLla[0] = GPS_ref_lla[0];
+    flash_cfg_.refLla[1] = GPS_ref_lla[1];
     flash_cfg_.refLla[2] = GPS_ref_lla[2];
 
     flash_cfg_.magInclination = mag_inclination;
@@ -157,14 +156,14 @@ InertialSenseROS::InertialSenseROS() :
 
 void InertialSenseROS::INS1_callback()
 {
-//    if (got_GPS_fix_ & inertial_init)
-//    {
-//        flash_cfg_.refLla[0] = d_.ins1.lla[0] * M_PI / 180.0;
-//        flash_cfg_.refLla[1] = d_.ins1.lla[1] * M_PI / 180.0;
-//        flash_cfg_.refLla[2] = d_.ins1.lla[2];
-//        inertialSenseInterface_.SetFlashConfig(flash_cfg_);
-//        inertial_init = false;
-//    }
+    if (got_GPS_fix_ & inertial_init)
+    {
+        flash_cfg_.refLla[0] = d_.ins1.lla[0];
+        flash_cfg_.refLla[1] = d_.ins1.lla[1];
+        flash_cfg_.refLla[2] = d_.ins1.lla[2];
+        inertialSenseInterface_.SetFlashConfig(flash_cfg_);
+        inertial_init = false;
+    }
     odom_msg2.header.frame_id = frame_id_;
 
     odom_msg2.pose.pose.position.x = d_.ins1.ned[0];

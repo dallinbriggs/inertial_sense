@@ -39,7 +39,6 @@ private:
   double GPS_to_week_offset_;
 
   nvm_flash_cfg_t flash_cfg_;
-  nvm_flash_cfg_t flash_cfg2_;
 
   std::string frame_id_;
 
