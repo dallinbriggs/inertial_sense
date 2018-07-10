@@ -36,10 +36,13 @@ private:
   ros::Duration INS_local_offset_;
   double GPS_towOffset_; // The offset between GPS time-of-week and local time on the uINS
   uint64_t GPS_week_;
+  bool got_GPS_fix_ = false;
+  bool inertial_init = true;
 
   nvm_flash_cfg_t flash_cfg_;
 
   std::string frame_id_;
+  std::string frame_id_2;
 
   // ROS Stream handling
   typedef struct
@@ -76,6 +79,7 @@ private:
   // Data to hold on to in between callbacks
   sensor_msgs::Imu imu1_msg, imu2_msg;
   nav_msgs::Odometry odom_msg;
+  nav_msgs::Odometry odom_msg2;
   inertial_sense::GPS gps_msg;
   inertial_sense::GPSInfo gps_info_msg;
 
