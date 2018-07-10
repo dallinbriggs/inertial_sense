@@ -10,8 +10,8 @@ InertialSenseROS::InertialSenseROS() :
 {
   nh_private_.param<std::string>("port", port_, "/dev/ttyUSB0");
   nh_private_.param<int>("baudrate", baudrate_, 3000000);
-  nh_private_.param<std::string>("frame_id", frame_id_, "body");
-  nh_private_.param<std::string>("frame_id_2", frame_id_2, "inertial");
+  nh_private_.param<std::string>("frame_id", frame_id_, "body_inertial");
+  // nh_private_.param<std::string>("frame_id_2", frame_id_2, "inertial");
 
   // Connect to the uINS
   if (!inertialSenseInterface_.Open(port_.c_str(), baudrate_))
@@ -83,7 +83,7 @@ InertialSenseROS::InertialSenseROS() :
   if (INS_.stream_on)
   {
     INS_.pub = nh_.advertise<nav_msgs::Odometry>("ins", 1);
-    INS_.pub2 = nh_.advertise<nav_msgs::Odometry>("inertial_frame", 1);
+    INS_.pub2 = nh_.advertise<nav_msgs::Odometry>("euler", 1);
     inertialSenseInterface_.BroadcastBinaryData(DID_INS_1, (int)(1000/INS_.stream_rate), &data_callback);
     inertialSenseInterface_.BroadcastBinaryData(DID_INS_2, (int)(1000/INS_.stream_rate), &data_callback);
     inertialSenseInterface_.BroadcastBinaryData(DID_DUAL_IMU, (int)(1000/INS_.stream_rate), &data_callback);
@@ -155,12 +155,6 @@ InertialSenseROS::InertialSenseROS() :
 
 void InertialSenseROS::INS1_callback()
 {
-  odom_msg.header.frame_id = frame_id_;
-
-  odom_msg.pose.pose.position.x = d_.ins1.ned[0];
-  odom_msg.pose.pose.position.y = d_.ins1.ned[1];
-  odom_msg.pose.pose.position.z = d_.ins1.ned[2];
-
   if (got_GPS_fix_ & inertial_init)
   {
     flash_cfg_.refLla[0] = d_.ins1.lla[0];
@@ -170,7 +164,13 @@ void InertialSenseROS::INS1_callback()
     inertial_init = false;
   }
 
-  odom_msg2.header.frame_id = frame_id_2;
+  odom_msg.header.frame_id = frame_id_;
+
+  odom_msg.pose.pose.position.x = d_.ins1.ned[0];
+  odom_msg.pose.pose.position.y = d_.ins1.ned[1];
+  odom_msg.pose.pose.position.z = d_.ins1.ned[2];
+
+  odom_msg2.header.frame_id = frame_id_;
 
   odom_msg2.pose.pose.position.x = d_.ins1.ned[0];
   odom_msg2.pose.pose.position.y = d_.ins1.ned[1];
