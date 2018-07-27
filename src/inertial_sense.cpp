@@ -10,7 +10,7 @@ InertialSenseROS::InertialSenseROS() :
 {
   nh_private_.param<std::string>("port", port_, "/dev/ttyUSB0");
   nh_private_.param<int>("baudrate", baudrate_, 3000000);
-  nh_private_.param<std::string>("frame_id", frame_id_, "body");
+  nh_private_.param<std::string>("frame_id", frame_id_, "body_inertial");
 
   /// Connect to the uINS
 
@@ -208,6 +208,16 @@ void InertialSenseROS::flash_config_callback(const nvm_flash_cfg_t * const msg)
 
 void InertialSenseROS::INS1_callback(const ins_1_t * const msg)
 {
+  if (got_GPS_fix_ & inertial_init_)
+  {
+    std::vector<double> refLla_ (3);
+    refLla_[0] = msg->lla[0];
+    refLla_[1] = msg->lla[1];
+    refLla_[2] = msg->lla[2];
+    nh_private_.setParam("GPS_ref_lla", refLla_);
+    set_vector_flash_config<double>("GPS_ref_lla", 3, offsetof(nvm_flash_cfg_t, refLla));
+    inertial_init_ = false;
+  }
   odom_msg.header.frame_id = frame_id_;
 
   odom_msg.pose.pose.position.x = msg->ned[0];
@@ -318,6 +328,14 @@ void InertialSenseROS::GPS_callback(const gps_nav_t * const msg)
     gps_msg.linear_velocity.y = msg->velNed[1];
     gps_msg.linear_velocity.z = msg->velNed[2];
     GPS_.pub.publish(gps_msg);
+  }
+
+  if (!got_GPS_fix_)
+  {
+    if ((msg->status & 0xFF00) == (unsigned int)GPS_STATUS_FIX_3D)
+    {
+        got_GPS_fix_ = true;
+    }
   }
 }
 

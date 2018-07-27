@@ -149,6 +149,10 @@ private:
   bool got_flash_config = false;
   nvm_flash_cfg_t flash_; // local copy of flash config
 
+  //Edits for Dallin's code
+  bool got_GPS_fix_ = false;
+  bool inertial_init_ = true;
+
 //  InertialSense inertialSenseInterface_;
 };
 
