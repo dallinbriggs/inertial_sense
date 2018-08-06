@@ -259,7 +259,7 @@ void InertialSenseROS::INS_variance_callback(const inl2_variance_t * const msg)
 void InertialSenseROS::INS2_callback(const ins_2_t * const msg)
 {
   insStatus_ = msg->insStatus;  
-  odom_msg.header.stamp = ros_time_from_week_and_tow(msg->week, msg->timeOfWeek);
+  odom_msg.header.stamp = ros::Time::now();
   odom_msg.header.frame_id = frame_id_;
 
   odom_msg.pose.pose.orientation.w = msg->qn2b[0];
@@ -281,7 +281,7 @@ void InertialSenseROS::INS2_callback(const ins_2_t * const msg)
 
 void InertialSenseROS::IMU_callback(const dual_imu_t* const msg)
 {
-  imu1_msg.header.stamp = imu2_msg.header.stamp = ros_time_from_start_time(msg->time);
+  imu1_msg.header.stamp = ros::Time::now();
   imu1_msg.header.frame_id = imu2_msg.header.frame_id = frame_id_;
 
   imu1_msg.angular_velocity.x = msg->I[0].pqr[0];
@@ -312,7 +312,7 @@ void InertialSenseROS::GPS_callback(const gps_nav_t * const msg)
   GPS_towOffset_ = msg->towOffset;
   if (GPS_.enabled)
   {
-    gps_msg.header.stamp = ros_time_from_week_and_tow(msg->week, msg->towOffset);
+    gps_msg.header.stamp = ros::Time::now();
     gps_msg.fix_type = msg->status & GPS_STATUS_FIX_MASK;
     gps_msg.header.frame_id =frame_id_;
     gps_msg.num_sat = (uint8_t)(msg->status & GPS_STATUS_NUM_SATS_USED_MASK);
@@ -427,7 +427,7 @@ void InertialSenseROS::strobe_in_time_callback(const strobe_in_time_t * const ms
 
 void InertialSenseROS::GPS_Info_callback(const gps_sat_t* const msg)
 {
-  gps_info_msg.header.stamp =ros_time_from_tow(msg->timeOfWeekMs/1e3);
+  gps_info_msg.header.stamp =ros::Time::now();
   gps_info_msg.header.frame_id = frame_id_;
   gps_info_msg.num_sats = msg->numSats;
   for (int i = 0; i < 50; i++)
@@ -442,7 +442,7 @@ void InertialSenseROS::GPS_Info_callback(const gps_sat_t* const msg)
 void InertialSenseROS::mag_callback(const magnetometer_t* const msg, int mag_number)
 {
   sensor_msgs::MagneticField mag_msg;
-  mag_msg.header.stamp = ros_time_from_start_time(msg->time);
+  mag_msg.header.stamp = ros::Time::now();
   mag_msg.header.frame_id = frame_id_;
   mag_msg.magnetic_field.x = msg->mag[0];
   mag_msg.magnetic_field.y = msg->mag[1];
@@ -461,7 +461,7 @@ void InertialSenseROS::mag_callback(const magnetometer_t* const msg, int mag_num
 void InertialSenseROS::baro_callback(const barometer_t * const msg)
 {
   sensor_msgs::FluidPressure baro_msg;
-  baro_msg.header.stamp = ros_time_from_start_time(msg->time);
+  baro_msg.header.stamp = ros::Time::now();
   baro_msg.header.frame_id = frame_id_;
   baro_msg.fluid_pressure = msg->bar;
 
@@ -471,7 +471,7 @@ void InertialSenseROS::baro_callback(const barometer_t * const msg)
 void InertialSenseROS::preint_IMU_callback(const preintegrated_imu_t * const msg)
 {
   inertial_sense::PreIntIMU preintIMU_msg;   
-  preintIMU_msg.header.stamp = ros_time_from_start_time(msg->time);
+  preintIMU_msg.header.stamp = ros::Time::now();
   preintIMU_msg.header.frame_id = frame_id_;
   preintIMU_msg.dtheta.x = msg->theta1[0];
   preintIMU_msg.dtheta.y = msg->theta1[1];
